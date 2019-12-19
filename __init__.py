@@ -73,7 +73,7 @@ class FACSvatarPreferences(AddonPreferences):
                               )
     socket_port: StringProperty(name="Socket port",
                                 description="Port of ZMQ publisher socket",
-                                default="5550",
+                                default="5572",
                                 )
 
     def draw(self, context):

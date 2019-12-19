@@ -63,9 +63,11 @@ class FACSVATAR_PT_zmqConnector(Panel):
                 layout.prop(socket_settings, "msg_received")
 
             row = layout.row()
+            row.prop(socket_settings, 'facial_configuration')
             row.prop(socket_settings, 'rotate_head')
+            row = layout.row()
+            row.prop(socket_settings, 'keyframing')
             row.prop(socket_settings, 'mirror_head')
-            layout.prop(socket_settings, 'keyframing')
 
         # if not installed, show button that enables & updates pip, and pip installs pyzmq
         except ImportError:

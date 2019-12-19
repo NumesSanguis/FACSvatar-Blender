@@ -23,6 +23,7 @@ import bpy
 import sys
 import subprocess  # use Python executable (for pip usage)
 from pathlib import Path  # Object-oriented filesystem paths since Python 3.4
+import json
 
 
 class SOCKET_OT_connect_subscriber(bpy.types.Operator):
@@ -58,9 +59,9 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
             self.url = f"tcp://{preferences.socket_ip}:{preferences.socket_port}"
             # store our connection in Blender's WindowManager for access in self.timed_msg_poller()
             bpy.types.WindowManager.socket_sub = self.zmq_ctx.socket(zmq.SUB)
-            bpy.types.WindowManager.socket_sub.bind(self.url)  # publisher connects to this (subscriber)
+            bpy.types.WindowManager.socket_sub.connect(self.url)  # publisher connects to this (subscriber)
             bpy.types.WindowManager.socket_sub.setsockopt(zmq.SUBSCRIBE, ''.encode('ascii'))
-            self.report({'INFO'}, "Sub bound to: {}\nWaiting for data...".format(self.url))
+            self.report({'INFO'}, "Sub connected to: {}\nWaiting for data...".format(self.url))
 
             # poller socket for checking server replies (synchronous - not sure how to use async with Blender)
             self.poller = zmq.Poller()
@@ -113,35 +114,49 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                 # get the message
                 topic, timestamp, msg = socket_sub.recv_multipart()
                 print("On topic {}, received data: {}".format(topic, msg))
+                # turn bytes to json string
                 msg = msg.decode('utf-8')
                 # context stays the same as when started?
                 self.socket_settings.msg_received = msg
+                # check if we didn't receive None (final message)
+                if msg:
+                    # turn json string to dict
+                    msg = json.loads(msg)
 
-                # update selected obj only if property `dynamic_object` is on (blendzmq_props.py)
-                if self.socket_settings.dynamic_object:
-                    # only active object (no need for a copy)
-                    # self.selected_obj = bpy.context.scene.view_layers[0].objects.active
-                    # collections work with pointers and doesn't keep the old reference, therefore we need a copy
-                    self.selected_objs = bpy.context.scene.view_layers[0].objects.selected.items().copy()
+                    # update selected obj only if property `dynamic_object` is on (blendzmq_props.py)
+                    if self.socket_settings.dynamic_object:
+                        # only active object (no need for a copy)
+                        # self.selected_obj = bpy.context.scene.view_layers[0].objects.active
+                        # collections work with pointers and doesn't keep the old reference, therefore we need a copy
+                        self.selected_objs = bpy.context.scene.view_layers[0].objects.selected.items().copy()
 
-                # if we only wanted to update the active object with `.objects.active`
-                # self.selected_obj.location.x = move_val
-                # move all (previously) selected objects' x coordinate to move_val
-                for obj in self.selected_objs:
-                    # TODO check if FACS compatible model
-                    insert_frame = self.frame_start + msg['frame']
+                    # if we only wanted to update the active object with `.objects.active`
+                    # self.selected_obj.location.x = move_val
+                    # move all (previously) selected objects' x coordinate to move_val
+                    for obj in self.selected_objs:
+                        # TODO check if FACS compatible model
+                        print(obj)
+                        print()
+                        print(dir(obj[1]))
+                        print()
+                        insert_frame = self.frame_start + msg['frame']
 
-                    # set blendshapes only if blendshape data is available and not empty
-                    if 'blendshapes' in msg and msg['blendshapes']:
-                        self.set_blendshapes(obj, msg['blendshapes'], insert_frame)
-                    else:
-                        self.report({'INFO'}, "No blendshape data found in received msg")
+                        # set blendshapes only if blendshape data is available and not empty
+                        if self.socket_settings.rotate_head  and 'blendshapes' in msg and msg['blendshapes']:
+                            # obj[1] == bpy.data.objects['mb_model']
+                            self.set_blendshapes(obj[1], msg['blendshapes'], insert_frame)
+                        else:
+                            self.report({'INFO'}, "No blendshape data found in received msg")
 
-                    # set pose only if bone rotation is on, pose data is available and not empty
-                    if self.socket_settings.rotate_head and 'pose' in msg and msg['pose']:
-                        self.set_head_neck_pose(obj, msg['pose'], insert_frame)
-                    else:
-                        self.report({'INFO'}, "No pose data found in received msg")
+                        # set pose only if bone rotation is on, pose data is available and not empty
+                        if self.socket_settings.rotate_head and 'pose' in msg and msg['pose']:
+                            # obj[1] == bpy.data.objects['mb_model']
+                            self.set_head_neck_pose(obj[1], msg['pose'], insert_frame)
+                        else:
+                            self.report({'INFO'}, "No pose data found in received msg")
+
+                else:
+                    self.socket_settings.msg_received = "Last message received."
 
             # keep running and check every 0.1 millisecond for new ZeroMQ messages
             return 0.001
@@ -158,6 +173,7 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                 # MB fix Caucasian female
                 # if not bs == "Expressions_eyeClosedR_max":
                 val = blendshape_data[bs]
+                # obj[bs].value = val
                 obj.data.shape_keys.key_blocks[bs].value = val
                 # save as key frames if enabled
                 if self.socket_settings.keyframing:

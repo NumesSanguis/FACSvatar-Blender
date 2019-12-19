@@ -53,8 +53,13 @@ class ZMQSocketProperties(PropertyGroup):
                                  description="Stream data to selected objects (False: stream to same objects)",
                                  default=True
                                  )
+    facial_configuration: BoolProperty(
+        name="Move facial shapekeys",
+        description="Blendshape / shape key data updates character",
+        default=True)
+
     rotate_head: BoolProperty(
-        name="Rotate bones",
+        name="Rotate head bones",
         description="Use rotate data to rotate head and neck bones",
         default=True)
 

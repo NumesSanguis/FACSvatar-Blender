@@ -37,7 +37,7 @@ for programs outside Blender.
      3. `conda activate bzmq`  # activate newly created environment
      4. `conda install -c anaconda pyzmq`  # install pyzmq in this environment
    - System Python: `pip install pyzmq`
-- FACSvatar: https://github.com/NumesSanguis
+- FACSvatar: https://github.com/NumesSanguis/FACSvatar
 
 ## How to use
 1. Download this repository as a .zip by:
