@@ -142,7 +142,7 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                         insert_frame = self.frame_start + msg['frame']
 
                         # set blendshapes only if blendshape data is available and not empty
-                        if self.socket_settings.rotate_head  and 'blendshapes' in msg and msg['blendshapes']:
+                        if self.socket_settings.facial_configuration and 'blendshapes' in msg and msg['blendshapes']:
                             # obj[1] == bpy.data.objects['mb_model']
                             self.set_blendshapes(obj[1], msg['blendshapes'], insert_frame)
                         else:
