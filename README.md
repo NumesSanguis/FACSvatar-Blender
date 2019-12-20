@@ -3,7 +3,7 @@ Blender 2.8x companion add-on to the [FACSvatar project](https://github.com/Nume
 This add-on allows streaming of facial configuration and head pose data (from another computer) into Blender over ZeroMQ sockets,
 **without** freezing the interface (publisher-subscriber pattern).
 
-***UNDER CONSTRUCTION*** - Still needs testing
+**Code working - *README in progress***
 
 Standalone Blender-outside data transfer - BlendZMQ: https://github.com/NumesSanguis/Blender-ZMQ-add-on
 
@@ -25,7 +25,7 @@ a message from outside (using `zmq.Poller()`). If so, process that data to move 
 This timer keeps being invoked until the socket has been disconnected.
 See for a demonstration:
 
-[![BlendZMQ demo](https://img.youtube.com/vi/68zSpWZirtI/0.jpg)](https://youtu.be/68zSpWZirtI)]
+[![BlendZMQ demo](https://img.youtube.com/vi/wGDdDCS3E1g/0.jpg)](https://youtu.be/wGDdDCS3E1g)
 
 
 ## Prerequisite
