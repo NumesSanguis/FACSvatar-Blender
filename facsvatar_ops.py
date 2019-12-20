@@ -113,7 +113,7 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
             if socket_sub in sockets:
                 # get the message
                 topic, timestamp, msg = socket_sub.recv_multipart()
-                print("On topic {}, received data: {}".format(topic, msg))
+                # print("On topic {}, received data: {}".format(topic, msg))
                 # turn bytes to json string
                 msg = msg.decode('utf-8')
                 # context stays the same as when started?
@@ -135,25 +135,24 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                     # move all (previously) selected objects' x coordinate to move_val
                     for obj in self.selected_objs:
                         # TODO check if FACS compatible model
-                        print(obj)
-                        print()
-                        print(dir(obj[1]))
-                        print()
-                        insert_frame = self.frame_start + msg['frame']
+                        try:
+                            insert_frame = self.frame_start + msg['frame']
 
-                        # set blendshapes only if blendshape data is available and not empty
-                        if self.socket_settings.facial_configuration and 'blendshapes' in msg and msg['blendshapes']:
-                            # obj[1] == bpy.data.objects['mb_model']
-                            self.set_blendshapes(obj[1], msg['blendshapes'], insert_frame)
-                        else:
-                            self.report({'INFO'}, "No blendshape data found in received msg")
+                            # set blendshapes only if blendshape data is available and not empty
+                            if self.socket_settings.facial_configuration and 'blendshapes' in msg and msg['blendshapes']:
+                                # obj[1] == bpy.data.objects['mb_model']
+                                self.set_blendshapes(obj[1], msg['blendshapes'], insert_frame)
+                            else:
+                                self.report({'INFO'}, "No blendshape data found in received msg")
 
-                        # set pose only if bone rotation is on, pose data is available and not empty
-                        if self.socket_settings.rotate_head and 'pose' in msg and msg['pose']:
-                            # obj[1] == bpy.data.objects['mb_model']
-                            self.set_head_neck_pose(obj[1], msg['pose'], insert_frame)
-                        else:
-                            self.report({'INFO'}, "No pose data found in received msg")
+                            # set pose only if bone rotation is on, pose data is available and not empty
+                            if self.socket_settings.rotate_head and 'pose' in msg and msg['pose']:
+                                # obj[1] == bpy.data.objects['mb_model']
+                                self.set_head_neck_pose(obj[1], msg['pose'], insert_frame)
+                            else:
+                                self.report({'INFO'}, "No pose data found in received msg")
+                        except:
+                            self.report({'WARNING'}, "Object likely not a support model")
 
                 else:
                     self.socket_settings.msg_received = "Last message received."
