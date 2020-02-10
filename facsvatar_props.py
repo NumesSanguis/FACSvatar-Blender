@@ -28,7 +28,7 @@ from bpy.props import (
         )
 
 
-class ZMQSocketProperties(PropertyGroup):
+class FACSvatarProperties(PropertyGroup):
     """ZeroMQ socket Properties"""
 
     #   moved to __init__.py -> FACSvatarPreferences()
@@ -74,7 +74,7 @@ class ZMQSocketProperties(PropertyGroup):
         default=False)
 
 
-class PIPZMQProperties(PropertyGroup):
+class PIPFACSvatarProperties(PropertyGroup):
     """pip install and pyzmq install Properties"""
     install_status: StringProperty(name="Install status",
                                    description="Install status messages",
@@ -90,13 +90,13 @@ class PIPZMQProperties(PropertyGroup):
 
 
 def register():
-    bpy.utils.register_class(PIPZMQProperties)
-    bpy.utils.register_class(ZMQSocketProperties)
+    bpy.utils.register_class(PIPFACSvatarProperties)
+    bpy.utils.register_class(FACSvatarProperties)
 
 
 def unregister():
-    bpy.utils.unregister_class(ZMQSocketProperties)
-    bpy.utils.unregister_class(PIPZMQProperties)
+    bpy.utils.unregister_class(FACSvatarProperties)
+    bpy.utils.unregister_class(PIPFACSvatarProperties)
 
 
 if __name__ == "__main__":

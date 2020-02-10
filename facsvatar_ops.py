@@ -44,7 +44,7 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
 
         # get access to our Properties defined in BlendzmqPreferences() (__init__.py)
         preferences = context.preferences.addons[__package__].preferences
-        # get access to our Properties in ZMQSocketProperties() (blendzmq_props.py)
+        # get access to our Properties in FACSvatarProperties() (blendzmq_props.py)
         self.socket_settings = context.window_manager.socket_settings
 
         # connect our socket if it wasn't and call Blender's timer function on self.timed_msg_poller
@@ -226,29 +226,75 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
 
     def execute(self, context):  # execute() is called when running the operator.
         install_props = context.window_manager.install_props
-        install_props.install_status = "Preparing to enable pip..."
 
-        # OS independent (Windows: bin\python.exe; Linux: bin/python3.7m)
-        py_path = Path(sys.prefix) / "bin"
-        py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
+        # pip in Blender:
+        # https://blender.stackexchange.com/questions/139718/install-pip-and-packages-from-within-blender-os-independently/
+        # pip 2.81 issues: https://developer.blender.org/T71856
+
+        # no pip enabled by default version < 2.81
+        install_props.install_status = "Preparing to enable pip..."
+        self.report({'INFO'}, "Preparing to enable pip...")
+        if bpy.app.version[0] == 2 and bpy.app.version[1] < 81:
+            # find python binary OS independent (Windows: bin\python.exe; Linux: bin/python3.7m)
+            py_path = Path(sys.prefix) / "bin"
+            py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
+
+            if subprocess.call([py_exec, "-m", "ensurepip"]) != 0:
+                install_props.install_status += "\nCouldn't activate pip."
+                self.report({'ERROR'}, "Couldn't activate pip.")
+                return {'CANCELLED'}
+
+        # from 2.81 pip is enabled by default
+        else:
+            try:
+                # will likely fail the first time, but works after `ensurepip.bootstrap()` has been called once
+                import pip
+            except ModuleNotFoundError as e:
+                # only first attempt will reach here
+                print("Pip import failed with: ", e)
+                install_props.install_status += "\nPip not activated, trying bootstrap()"
+                self.report({'ERROR'}, "Pip not activated, trying bootstrap()")
+                try:
+                    import ensurepip
+                    ensurepip.bootstrap()
+                except:  # catch *all* exceptions
+                    e = sys.exc_info()[0]
+                    install_props.install_status += "\nPip not activated, trying bootstrap()"
+                    self.report({'ERROR'}, "Pip not activated, trying bootstrap()")
+                    print("bootstrap failed with: ", e)
+            py_exec = bpy.app.binary_path_python
+
         # TODO check permission rights
-        if subprocess.call([py_exec, "-m", "ensurepip"]) != 0:
-            install_props.install_status += "\nCouldn't activate pip."
-            self.report({'ERROR'}, "Couldn't activate pip.")
-            return {'CANCELLED'}
+        # TODO Windows ask for permission:
+        #  https://stackoverflow.com/questions/130763/request-uac-elevation-from-within-a-python-script
+
         install_props.install_status += "\nPip activated! Updating pip..."
         self.report({'INFO'}, "Pip activated! Updating pip...")
-        if subprocess.call([py_exec, "-m", "pip", "install", "--upgrade", "pip"]) != 0:
-            install_props.install_status += "\nCouldn't update pip."
-            self.report({'ERROR'}, "Couldn't update pip.")
-            return {'CANCELLED'}
-        install_props.install_status += "\nPip updated! Installing pyzmq..."
-        self.report({'INFO'}, "Pip updated! Installing pyzmq...")
 
-        if subprocess.call([py_exec, "-m", "pip", "install", "pyzmq"]) != 0:
+        # pip update
+        try:
+            print("Trying pip upgrade")
+            output = subprocess.check_output([py_exec, '-m', 'pip', 'install', '--upgrade', 'pip'])
+            print(output)
+        except subprocess.CalledProcessError as e:
+            install_props.install_status += "\nCouldn't update pip. Please restart Blender and try again."
+            self.report({'ERROR'}, "Couldn't update pip. Please restart Blender and try again.")
+            print(e.output)
+            return {'CANCELLED'}
+        install_props.install_status += "\nPip working! Installing pyzmq..."
+        self.report({'INFO'}, "Pip working! Installing pyzmq...")
+
+        # pyzmq pip install
+        try:
+            print("Trying pyzmq install")
+            output = subprocess.check_output([py_exec, '-m', 'pip', 'install', 'pyzmq'])
+            print(output)
+        except subprocess.CalledProcessError as e:
             install_props.install_status += "\nCouldn't install pyzmq."
             self.report({'ERROR'}, "Couldn't install pyzmq.")
+            print(e.output)
             return {'CANCELLED'}
+
         install_props.install_status += "\npyzmq installed! READY!"
         self.report({'INFO'}, "pyzmq installed! READY!")
 

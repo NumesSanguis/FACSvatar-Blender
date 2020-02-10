@@ -54,7 +54,7 @@ from bpy.props import (
     PointerProperty,
     StringProperty,
 )
-from . facsvatar_props import PIPZMQProperties, ZMQSocketProperties
+from . facsvatar_props import PIPFACSvatarProperties, FACSvatarProperties
 from . facsvatar_panel import FACSVATAR_PT_zmqConnector
 from . facsvatar_ops import SOCKET_OT_connect_subscriber, PIPZMQ_OT_pip_pyzmq
 
@@ -87,8 +87,8 @@ class FACSvatarPreferences(AddonPreferences):
 
 # Define Classes to register
 classes = (
-    PIPZMQProperties,
-    ZMQSocketProperties,
+    PIPFACSvatarProperties,
+    FACSvatarProperties,
     PIPZMQ_OT_pip_pyzmq,
     SOCKET_OT_connect_subscriber,
     FACSvatarPreferences,
@@ -102,8 +102,8 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.WindowManager.install_props = PointerProperty(type=PIPZMQProperties)
-    bpy.types.WindowManager.socket_settings = PointerProperty(type=ZMQSocketProperties)
+    bpy.types.WindowManager.install_props = PointerProperty(type=PIPFACSvatarProperties)
+    bpy.types.WindowManager.socket_settings = PointerProperty(type=FACSvatarProperties)
 
 
 def unregister():

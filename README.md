@@ -7,6 +7,12 @@ This add-on allows streaming of facial configuration and head pose data (from an
 
 Standalone Blender-outside data transfer - BlendZMQ: https://github.com/NumesSanguis/Blender-ZMQ-add-on
 
+## Update
+- FACSvatar v0.4.0 branch - 2020-02-10 - **Blender 2.81+ pip support**: In Blender 2.81 pip is enabled by default.
+This update takes that behavior into account. If the `Enable pip & install pyzmq` button fails, it still executes
+`ensurepip.bootstrap()`. Restart Blender and try again, it will work this time
+(on Windows make sure you run with admin rights).
+
 ## Overview
 Blender is very powerful software, but if you run your own code that's a bit heavy, you quickly make the interface
 unresponsive. I.e freezing the interface.
@@ -29,14 +35,6 @@ See for a demonstration:
 
 
 ## Prerequisite
-- Python (tested with 3.7, probably 2.7, 3.5+ works too) on your system with `pyzmq`
-for programs outside Blender.
-   - Anaconda (recommended to manage Python environments)
-     1. Anaconda 3.7+: https://www.anaconda.com/distribution/
-     2. `conda create --name bzmq python=3.7`  # create environment with Python 3.7
-     3. `conda activate bzmq`  # activate newly created environment
-     4. `conda install -c anaconda pyzmq`  # install pyzmq in this environment
-   - System Python: `pip install pyzmq`
 - FACSvatar: https://github.com/NumesSanguis/FACSvatar
 
 ## How to use
@@ -51,18 +49,13 @@ for programs outside Blender.
 1. Open side panel in 3D view by
    - Pressing `n` on your keyboard
    - Dragging `<` to the left
-1. Click "bZMQ" -> "Enable pip & install pyzmq" button
+1. Click "FACSvatar" -> "Enable pip & install pyzmq" button
+1. Create a [MB-Lab character](https://mblab.dev/download/) (Use EEVEE engine), finalize it and select the character.
+1. In the settings panel, go to `Modifier Properties` (blue wrench icon) -> `mbastlab_subdvision` ->
+   Set Subdivisions: Viewport to `0` (for performance reasons) 
 1. Click "Connect socket" button. Now it's waiting for data message from outside.
-1. Start outside script to send data into blender (Get the script by downloading from the GitHub repo / unzip previously downloaded ZIP):
-   1. Get script by:
-      * Unziping the .zip downloaded in step 1
-      * In terminal: `git clone https://github.com/NumesSanguis/Blender-ZMQ-add-on`
-   2. Open a terminal and navigate to `cd *path*/Blender-ZMQ-add-on`
-   3. Make sure conda / virtual env is active (e.g. `conda activate bzmq`) with `pyzmq`
-   4. Execute: `python zmq_pub_number_gen.py` (Change ip or port by adding `--ip 192.168.x.x` and/or `--port 8080`)
-1. See objects moving!
-   - "Dynamic objects" can be selected to update location of current selected objects
-   - "Dynamic objects" can be deselected to keep updating only the objects that were active at deselection time.
+1. Follow the instructions over at [FACSvatar](https://github.com/NumesSanguis/FACSvatar) and send data to port 5572
+   (the Quickstart automatically has this correct).
     
     
 ## Troubleshooting
