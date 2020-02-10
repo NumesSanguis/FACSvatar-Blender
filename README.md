@@ -39,23 +39,23 @@ See for a demonstration:
 
 ## How to use
 1. Download this repository as a .zip by:
-   - Go to https://github.com/NumesSanguis/Blender-ZMQ-add-on/releases and download the ZIP, or
+   - Go to https://github.com/NumesSanguis/FACSvatar-Blender/releases/ and download the ZIP, or
    - Clicking the green "Clone or download" button and choose "Download ZIP"
 1. Start Blender with Administrator right (at least on Windows) to allow enabling of `pip` and installing `pyzmq`
 (does NOT work with a Snap package install of Blender on Linux, see troubleshooting)
 1. In Blender, add this add-on by selecting Edit -> Preferences -> Add-ons ->
    1. Install... -> select downloaded ZIP from step 1 -> Install Add-on
-   1. Search: `blendzmq` -> click checkbox to activate
+   1. Search: `FACSvatar` -> click checkbox to activate
 1. Open side panel in 3D view by
    - Pressing `n` on your keyboard
    - Dragging `<` to the left
-1. Click "FACSvatar" -> "Enable pip & install pyzmq" button
+1. Click "FACSvatar" -> "Enable pip & install pyzmq" button (if fail, restart Blender and try again (with admin rights))
 1. Create a [MB-Lab character](https://mblab.dev/download/) (Use EEVEE engine), finalize it and select the character.
 1. In the settings panel, go to `Modifier Properties` (blue wrench icon) -> `mbastlab_subdvision` ->
    Set Subdivisions: Viewport to `0` (for performance reasons) 
-1. Click "Connect socket" button. Now it's waiting for data message from outside.
+1. Click "Connect socket" button. Now it's waiting for data message from FACSvatar.
 1. Follow the instructions over at [FACSvatar](https://github.com/NumesSanguis/FACSvatar) and send data to port 5572
-   (the Quickstart automatically has this correct).
+   (the Quickstart setup automatically uses this port).
     
     
 ## Troubleshooting
