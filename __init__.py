@@ -22,13 +22,14 @@
 bl_info = {
     "name": "FACSvatar",
     "author": "Stef van der Struijk",
-    "version": (0, 4, 0),
-    "blender": (2, 80, 0),  # also tested with 2.81
+    "version": (0, 5, 0),
+    "blender": (3, 3, 0),  # all LTS versions supported from 2.80 to this version
     "location": "View3D > Sidebar > Create Tab",
     "description": "Connects FACSvatar with Blender through ZeroMQ without freezing the interface",
     "warning": "",
-    "wiki_url": "https://github.com/NumesSanguis/FACSvatar",
-    "category": "Development"}
+    "wiki_url": "https://github.com/NumesSanguis/FACSvatar-Blender",
+    "category": "Development"
+}
 
 # add-on is being reloaded
 if "bpy" in locals():
@@ -93,7 +94,15 @@ classes = (
     SOCKET_OT_connect_subscriber,
     FACSvatarPreferences,
     FACSVATAR_PT_zmqConnector,
-    )
+)
+
+
+# # connect socket at startup
+# # prevent error: AttributeError: '_RestrictContext' object has no attribute 'view_layer'
+# @persistent
+# def delayed_start(scene):
+#     print("Delayed start function")
+#     bpy.ops.bbpsocket.connect_subscriber()
 
 
 # one-liner to (un)register if no property registration was needed
@@ -107,6 +116,8 @@ def register():
 
 
 def unregister():
+    # TODO del variables first?
+    # https://docs.blender.org/api/current/info_overview.html#inter-class-dependencies
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
     del bpy.types.WindowManager.socket_settings

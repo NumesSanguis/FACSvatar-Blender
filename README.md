@@ -8,6 +8,7 @@ This add-on allows streaming of facial configuration and head pose data (from an
 Standalone Blender-outside data transfer - BlendZMQ: https://github.com/NumesSanguis/Blender-ZMQ-add-on
 
 ## Update
+- (2023-06-17) Match the changes made to BlendZMQ to support Blender LTS up to version 3.3.
 - FACSvatar v0.4.0 branch - 2020-02-10 - **Blender 2.81+ pip support**: In Blender 2.81 pip is enabled by default.
 This update takes that behavior into account. If the `Enable pip & install pyzmq` button fails, it still executes
 `ensurepip.bootstrap()`. Restart Blender and try again, it will work this time
